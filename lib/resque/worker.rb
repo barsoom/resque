@@ -160,13 +160,13 @@ module Resque
     # has completed processing. Useful for testing.
     def work(interval = 0.5, &block)
       interval = Float(interval)
-      interval = 0.5 # TODO: don't do this :)
+      interval = 0.05 # TODO: don't do this :)
       $0 = "resque: Starting"
       startup
 
-debuginfo('RDEBUG: entering work loop')
+#debuginfo('RDEBUG: entering work loop')
       loop do
-debuginfo('RDEBUG: looping...')
+#debuginfo('RDEBUG: looping...')
         break if shutdown?
 
         if not paused? and job = reserve
@@ -204,8 +204,8 @@ debuginfo('RDEBUG: looping...')
           @child = nil
         else
           break if interval.zero?
-          log! "Sleeping for #{interval} seconds"
-          procline paused? ? "Paused" : "Waiting for #{@queues.join(',')}"
+          #log! "Sleeping for #{interval} seconds"
+          #procline paused? ? "Paused" : "Waiting for #{@queues.join(',')}"
           sleep interval
         end
       end
@@ -266,7 +266,7 @@ debuginfo('RDEBUG: got exception' + exception.inspect)
     # nil if no job can be found.
     def reserve
       queues.each do |queue|
-        log! "Checking #{queue}"
+        #log! "Checking #{queue}"
         if job = Resque.reserve(queue)
           log! "Found job on #{queue}"
           return job
