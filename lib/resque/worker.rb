@@ -572,7 +572,7 @@ debuginfo("RDEBUG: unregister_worker done!")
     end
 
     def debuginfo(message)
-      puts "#{message.inspect} (#{Process.pid} @ #{`hostname`})"
+      p "#{message.inspect} (#{Process.pid} @ #{`hostname`})"
     end
 
     # Given a job, tells Redis we're working on it. Useful for seeing
