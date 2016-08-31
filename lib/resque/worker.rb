@@ -165,6 +165,7 @@ module Resque
 
 p('RDEBUG: entering work loop')
       loop do
+p('RDEBUG: looping...')
         break if shutdown?
 
         if not paused? and job = reserve
