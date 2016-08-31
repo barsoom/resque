@@ -164,9 +164,9 @@ module Resque
       $0 = "resque: Starting"
       startup
 
-p('RDEBUG: entering work loop')
+debuginfo('RDEBUG: entering work loop')
       loop do
-p('RDEBUG: looping...')
+debuginfo('RDEBUG: looping...')
         break if shutdown?
 
         if not paused? and job = reserve
@@ -209,11 +209,11 @@ p('RDEBUG: looping...')
           sleep interval
         end
       end
-p('RDEBUG: exiting work loop')
+debuginfo('RDEBUG: exiting work loop')
 
       unregister_worker
     rescue Exception => exception
-p('RDEBUG: got exception' + exception.inspect)
+debuginfo('RDEBUG: got exception' + exception.inspect)
       unless exception.class == SystemExit && !@child && run_at_exit_hooks
         log "Failed to start worker : #{exception.inspect}"
 
@@ -375,7 +375,7 @@ p('RDEBUG: got exception' + exception.inspect)
       trap('INT')  { shutdown!  }
 
       begin
-        trap('QUIT') { p('RDEBUG: got QUIT');  shutdown   }
+        trap('QUIT') { debuginfo('RDEBUG: got QUIT');  shutdown   }
         if term_child
           trap('USR1') { new_kill_child }
         else
@@ -411,7 +411,7 @@ p('RDEBUG: got exception' + exception.inspect)
     # current job.
     def shutdown
       log 'Exiting...'
-      p "RDEBUG: #{caller.inspect}"
+      debuginfo "RDEBUG: #{caller.inspect}"
       @shutdown = true
     end
 
@@ -547,11 +547,11 @@ p('RDEBUG: got exception' + exception.inspect)
 
     # Unregisters ourself as a worker. Useful when shutting down.
     def unregister_worker(exception = nil)
-p('RDEBUG: unregister_worker called')
+debuginfo('RDEBUG: unregister_worker called')
       # If we're still processing a job, make sure it gets logged as a
       # failure.
       if (hash = processing) && !hash.empty?
-p('RDEBUG: unregister_worker fail?')
+debuginfo('RDEBUG: unregister_worker fail?')
         job = Job.new(hash['queue'], hash['payload'])
         # Ensure the proper worker is attached to this job, even if
         # it's not the precise instance that died.
@@ -559,7 +559,7 @@ p('RDEBUG: unregister_worker fail?')
         job.fail(exception || DirtyExit.new)
       end
 
-p("RDEBUG: unregister_worker calling redis for #{self}")
+debuginfo("RDEBUG: unregister_worker calling redis for #{self}")
       redis.pipelined do
         redis.srem(:workers, self)
         redis.del("worker:#{self}")
@@ -568,10 +568,10 @@ p("RDEBUG: unregister_worker calling redis for #{self}")
         Stat.clear("processed:#{self}")
         Stat.clear("failed:#{self}")
       end
-p("RDEBUG: unregister_worker done!")
+debuginfo("RDEBUG: unregister_worker done!")
     end
 
-    def p(message)
+    def debuginfo(message)
       puts "#{message.inspect} (#{Process.pid} @ #{`hostname`})"
     end
 
