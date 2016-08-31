@@ -158,7 +158,7 @@ module Resque
     #
     # Also accepts a block which will be passed the job as soon as it
     # has completed processing. Useful for testing.
-    def work(interval = 5.0, &block)
+    def work(interval = 0.5, &block)
       interval = Float(interval)
       $0 = "resque: Starting"
       startup
