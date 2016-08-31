@@ -371,7 +371,7 @@ debuginfo('RDEBUG: got exception' + exception.inspect)
     # USR2: Don't process any new jobs
     # CONT: Start processing jobs again after a USR2
     def register_signal_handlers
-      trap('TERM') { debuginfo("GOT TERM!?"); shutdown  }
+      trap('TERM') { debuginfo("GOT TERM!?"); shutdown!  }
       trap('INT')  { debuginfo("GOT INT!?"); shutdown!  }
 
       begin
