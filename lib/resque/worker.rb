@@ -163,6 +163,7 @@ module Resque
       $0 = "resque: Starting"
       startup
 
+p('RDEBUG: entering work loop')
       loop do
         break if shutdown?
 
@@ -206,9 +207,11 @@ module Resque
           sleep interval
         end
       end
+p('RDEBUG: exiting work loop')
 
       unregister_worker
     rescue Exception => exception
+p('RDEBUG: got exception' + exception.inspect)
       unless exception.class == SystemExit && !@child && run_at_exit_hooks
         log "Failed to start worker : #{exception.inspect}"
 
@@ -370,7 +373,7 @@ module Resque
       trap('INT')  { shutdown!  }
 
       begin
-        trap('QUIT') { shutdown   }
+        trap('QUIT') { p('RDEBUG: got QUIT');  shutdown   }
         if term_child
           trap('USR1') { new_kill_child }
         else
@@ -541,9 +544,11 @@ module Resque
 
     # Unregisters ourself as a worker. Useful when shutting down.
     def unregister_worker(exception = nil)
+p('RDEBUG: unregister_worker called')
       # If we're still processing a job, make sure it gets logged as a
       # failure.
       if (hash = processing) && !hash.empty?
+p('RDEBUG: unregister_worker fail?')
         job = Job.new(hash['queue'], hash['payload'])
         # Ensure the proper worker is attached to this job, even if
         # it's not the precise instance that died.
@@ -551,6 +556,7 @@ module Resque
         job.fail(exception || DirtyExit.new)
       end
 
+p("RDEBUG: unregister_worker calling redis for #{self}")
       redis.pipelined do
         redis.srem(:workers, self)
         redis.del("worker:#{self}")
@@ -559,6 +565,7 @@ module Resque
         Stat.clear("processed:#{self}")
         Stat.clear("failed:#{self}")
       end
+p("RDEBUG: unregister_worker done!")
     end
 
     # Given a job, tells Redis we're working on it. Useful for seeing
