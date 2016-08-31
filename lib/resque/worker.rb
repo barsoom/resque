@@ -160,6 +160,7 @@ module Resque
     # has completed processing. Useful for testing.
     def work(interval = 0.5, &block)
       interval = Float(interval)
+      interval = 0.5 # TODO: don't do this :)
       $0 = "resque: Starting"
       startup
 
