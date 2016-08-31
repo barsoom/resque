@@ -411,6 +411,7 @@ p('RDEBUG: got exception' + exception.inspect)
     # current job.
     def shutdown
       log 'Exiting...'
+      p "RDEBUG: #{caller.inspect}"
       @shutdown = true
     end
 
@@ -568,6 +569,10 @@ p("RDEBUG: unregister_worker calling redis for #{self}")
         Stat.clear("failed:#{self}")
       end
 p("RDEBUG: unregister_worker done!")
+    end
+
+    def p(message)
+      puts "#{message.inspect} (#{Process.pid} @ #{`hostname`})"
     end
 
     # Given a job, tells Redis we're working on it. Useful for seeing
